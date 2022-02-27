@@ -1,5 +1,26 @@
+use crate::components::Coordinates;
 use crate::resources::tile::Tile;
 use std::ops::{Deref, DerefMut};
+
+/// Delta coordinates for all 8 square neighbors
+const SQUARE_COORDINATES: [(i8, i8); 8] = [
+    // Bottom left
+    (-1, -1),
+    // Bottom
+    (0, -1),
+    // Bottom right
+    (1, -1),
+    // Left
+    (-1, 0),
+    // Right
+    (1, 0),
+    // Top Left
+    (-1, 1),
+    // Top
+    (0, 1),
+    // Top right
+    (1, 1),
+];
 
 /// Base tile map
 #[derive(Debug, Clone)]
@@ -23,6 +44,13 @@ impl TileMap {
             width,
             map,
         }
+    }
+
+    pub fn safe_square_at(&self, coordinates: Coordinates) -> impl Iterator<Item = Coordinates> {
+        SQUARE_COORDINATES
+            .iter()
+            .copied()
+            .map(move |tuple| coordinates + tuple)
     }
 
     #[cfg(feature = "debug")]
