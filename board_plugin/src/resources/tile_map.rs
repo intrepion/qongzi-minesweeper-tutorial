@@ -48,37 +48,37 @@ impl TileMap {
     }
 
     /// Places bombs and bomb neighbor tiles
-pub fn set_bombs(&mut self, bomb_count: u16) {
-    self.bomb_count = bomb_count;
-    let mut remaining_bombs = bomb_count;
-    let mut rng = thread_rng();
-    // Place bombs
-    while remaining_bombs > 0 {
-        let (x, y) = (
-            rng.gen_range(0..self.width) as usize,
-            rng.gen_range(0..self.height) as usize,
-        );
-        if let Tile::Empty = self[y][x] {
-            self[y][x] = Tile::Bomb;
-            remaining_bombs -= 1;
+    pub fn set_bombs(&mut self, bomb_count: u16) {
+        self.bomb_count = bomb_count;
+        let mut remaining_bombs = bomb_count;
+        let mut rng = thread_rng();
+        // Place bombs
+        while remaining_bombs > 0 {
+            let (x, y) = (
+                rng.gen_range(0..self.width) as usize,
+                rng.gen_range(0..self.height) as usize,
+            );
+            if let Tile::Empty = self[y][x] {
+                self[y][x] = Tile::Bomb;
+                remaining_bombs -= 1;
+            }
+        }
+        // Place bomb neighbors
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let coords = Coordinates { x, y };
+                if self.is_bomb_at(coords) {
+                    continue;
+                }
+                let num = self.bomb_count_at(coords);
+                if num == 0 {
+                    continue;
+                }
+                let tile = &mut self[y as usize][x as usize];
+                *tile = Tile::BombNeighbor(num);
+            }
         }
     }
-    // Place bomb neighbors
-    for y in 0..self.height {
-        for x in 0..self.width {
-            let coords = Coordinates { x, y };
-            if self.is_bomb_at(coords) {
-                continue;
-            }
-            let num = self.bomb_count_at(coords);
-            if num == 0 {
-                continue;
-            }
-            let tile = &mut self[y as usize][x as usize];
-            *tile = Tile::BombNeighbor(num);
-        }
-    }
-}
 
     pub fn is_bomb_at(&self, coordinates: Coordinates) -> bool {
         if coordinates.x >= self.width || coordinates.y >= self.height {
@@ -86,15 +86,15 @@ pub fn set_bombs(&mut self, bomb_count: u16) {
         };
         self.map[coordinates.y as usize][coordinates.x as usize].is_bomb()
     }
-    
+
     pub fn bomb_count_at(&self, coordinates: Coordinates) -> u8 {
         if self.is_bomb_at(coordinates) {
             return 0;
         }
         let res = self
-             .safe_square_at(coordinates)
-             .filter(|coord| self.is_bomb_at(*coord))
-             .count();
+            .safe_square_at(coordinates)
+            .filter(|coord| self.is_bomb_at(*coord))
+            .count();
         res as u8
     }
 
