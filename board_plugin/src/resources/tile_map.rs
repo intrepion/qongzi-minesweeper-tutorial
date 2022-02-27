@@ -46,6 +46,24 @@ impl TileMap {
         }
     }
 
+    pub fn is_bomb_at(&self, coordinates: Coordinates) -> bool {
+        if coordinates.x >= self.width || coordinates.y >= self.height {
+            return false;
+        };
+        self.map[coordinates.y as usize][coordinates.x as usize].is_bomb()
+    }
+    
+    pub fn bomb_count_at(&self, coordinates: Coordinates) -> u8 {
+        if self.is_bomb_at(coordinates) {
+            return 0;
+        }
+        let res = self
+             .safe_square_at(coordinates)
+             .filter(|coord| self.is_bomb_at(*coord))
+             .count();
+        res as u8
+    }
+
     pub fn safe_square_at(&self, coordinates: Coordinates) -> impl Iterator<Item = Coordinates> {
         SQUARE_COORDINATES
             .iter()
