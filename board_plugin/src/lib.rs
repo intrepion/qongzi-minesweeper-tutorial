@@ -4,6 +4,7 @@ pub mod resources;
 use bevy::log;
 use bevy::prelude::*;
 use resources::tile_map::TileMap;
+use resources::BoardOptions;
 
 pub struct BoardPlugin;
 
@@ -22,4 +23,11 @@ impl BoardPlugin {
         #[cfg(feature = "debug")]
         log::info!("{}", tile_map.console_output());
     }
+}
+
+pub fn create_board(
+    mut commands: Commands,
+    board_options: Option<Res<BoardOptions>>,
+    window: Res<WindowDescriptor>,
+) {
 }
